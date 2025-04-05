@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>기기 정보 보기</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    .device {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      background-color: #f9f9f9;
+    }
+    .device h2 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+    .device p {
+      margin: 4px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>📱 접속한 기기 목록</h1>
+  <div id="info">로딩 중...</div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAgjByq8kdcaFGx4Y01z0hHAxwDjeE4WTak",
+      authDomain: "friendtest-1a4ee.firebaseapp.com",
+      databaseURL: "https://friendtest-1a4ee-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "friendtest-1a4ee",
+      storageBucket: "friendtest-1a4ee.appspot.com",
+      messagingSenderId: "10590952555006",
+      appId: "1:10590952555006:web:659c3e9f0ae95f6ac688af",
+      measurementId: "G-P52QQX2TX3"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const infoDiv = document.getElementById('info');
+
+    db.ref('devices').on('value', (snapshot) => {
+      const data = snapshot.val();
+      infoDiv.innerHTML = '';
+      if (!data) {
+        infoDiv.innerHTML = "<p>기기 정보가 없습니다.</p>";
+        return;
+      }
+      for (let id in data) {
+        const d = data[id];
+        infoDiv.innerHTML += `
+          <div class="device">
+            <h2>기기 ID: ${id}</h2>
+            <p><strong>기기 기종:</strong> ${d.deviceModel || '알 수 없음'}</p>
+            <p><strong>사용자 에이전트:</strong> ${d.userAgent || '정보 없음'}</p>
+            <p><strong>화면 해상도:</strong> ${d.screenWidth || '?'} x ${d.screenHeight || '?'}</p>
+            <p><strong>접속 시각:</strong> ${d.timestamp ? new Date(d.timestamp).toLocaleString('ko-KR') : '정보 없음'}</p>
+            <p><strong>위치 정보:</strong> ${d.latitude && d.longitude ? `위도: ${d.latitude}, 경도: ${d.longitude}` : '허용되지 않음 또는 수집 안 됨'}</p>
+          </div>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>
